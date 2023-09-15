@@ -1,0 +1,98 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Social Network{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'network/styles.css' %}" rel="stylesheet" />
+        <script src="https://kit.fontawesome.com/cf75f52ecd.js" crossorigin="anonymous"></script>
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Roboto&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+        
+        <nav class="navbar navbar-light bg-secondary">
+            
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <img src="https://i.ibb.co/D1H8p3v/connect.png" alt="connect" height="30" width="100">
+                <strong>Network</strong>
+            </a>
+
+              <ul class="nav" style="width: 70%;">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user' request.user.id %}"><strong>{{ user.username }}</strong></a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'my_followingPosts' %}">Following</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'followers' request.user.id  %}">Followers</a>
+                    </li>
+                    <li class="nav-item" style="position: absolute; right:3%;">
+                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+          </nav>
+        <div class="body">
+            <div id="message" class="message"></div>
+        {% if user.is_authenticated %}
+            <div class="new-post">
+                <h3>New Post</h3>
+                <form id="newpostForm">
+                    <textarea name="newPost" id="newPost" rows="3" maxlength="150" placeholder="What's on your mind?... Type here"></textarea>
+                    <p id="count">0/150</p>
+                    <input type="submit" class="btn btn-primary">
+                </form>    
+            </div>
+        {% else %}
+            <h1 style="text-align: center;">Please Sign up/Sign in</h1>
+
+        {% endif %}
+            <div class="block_body">
+                {% block body %}
+                {% endblock %}
+            </div>
+            
+            {% block paginator %}
+            
+            {% endblock %}
+        </div>
+        
+
+
+
+
+
+
+
+        <script>
+            localStorage.setItem("user_id", "{{ request.user.id }}");
+        </script>
+
+        <script src="{% static 'network/layout.js' %}"></script>
+        <script src="{% static 'network/tools.js' %}"></script>
+        {% block script %}
+        {% endblock %}
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </body>
+</html>

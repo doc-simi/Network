@@ -1,0 +1,22 @@
+{% extends "network/layout.html" %}
+
+{% load static %}
+
+{% block body %}
+    
+{% endblock %}
+
+{% block paginator %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination float-left">
+        <li class="page-item"><button class="page-link" id="previous"><i class="fas fa-arrow-left"></i> Previous</button></li>
+    </ul>
+    <ul class="pagination float-right">
+        <li class="page-item"><button class="page-link" id="next">Next <i class="fas fa-arrow-right"></i></button></li>
+    </ul>
+</nav>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/posts.js' %}"></script>
+{% endblock %}

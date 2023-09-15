@@ -1,0 +1,181 @@
+{% extends "network/layout.html" %}
+
+{% load static %}
+
+
+{% block paginator %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination float-left">
+        <li class="page-item"><button class="page-link" id="previous"><i class="fas fa-arrow-left"></i> Previous</button></li>
+    </ul>
+    <ul class="pagination float-right">
+        <li class="page-item"><button class="page-link" id="next">Next <i class="fas fa-arrow-right"></i></button></li>
+    </ul>
+</nav>
+{% endblock %}
+
+
+{% block body %}
+
+
+    <div id="user-profile">
+        <div id="user-profile-header">
+            <figure>
+                <img src="https://i.ibb.co/ZfN7ypd/user.png" alt="user">
+                <figcaption>{{ user_profile.username }}</figcaption>
+            </figure>
+            <div id="following">
+                <h5><a href="{% url 'following' user_profile.id  %}">Following</a></h5>
+                <p>{{ user_profile.following }}</p>
+            </div>
+            <div id="follower">
+                <h5><a href="{% url 'followers' user_profile.id  %}">Followers</a></h5>
+                <p>{{ user_profile.followers }}</p>
+            </div>
+            <p class="text-muted"><i class="far fa-calendar-alt"></i>
+                Joined {{ date }}</p>
+            {% if user.is_authenticated %}
+            {% if request.user.id != user_profile.id %}
+                <p class="follow-btn">
+                    {% if following %}
+                        Following
+                    {% else %}
+                        Follow
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% endif %}
+        </div>
+        <div id="user-profile-posts">
+            
+        </div>
+    </div>
+
+    
+
+{% endblock %}
+
+{% block script %}
+        <script>
+        // Default start of the post to show 
+        let start = 0;
+        let end = 9;
+        const diff = 10;
+        let EOF;
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // load posts
+            fetch(`/posts/{{ user_profile.id }}?start=${start}&end=${end}`)
+            .then(response => response.json())
+            .then(result => {
+                create_elements(result.posts, document.querySelector("#user-profile-posts"));
+                EOF = result.posts_count
+
+                previous_btn.classList.add("disabled");
+                if (end >= EOF) {
+                    next_btn.classList.add("disabled");
+                }
+            });
+           
+            next_btn.onclick = next;
+            previous_btn.onclick = previous;
+            
+            function load_posts() {
+                fetch(`/posts/{{ user_profile.id }}?start=${start}&end=${end}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        create_elements(result.posts, document.querySelector("#user-profile-posts"));
+                        EOF = result.posts_count;
+                        
+                    });
+                }
+
+
+            function check_pags(arg) {
+                if (arg === "n") {
+                    if (end > EOF) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else if (arg === "p") {
+                    if (start - diff < 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            }
+
+            function check_btns(arg) {
+                if (arg === "p") {
+                    if (start <= 0) {
+                        previous_btn.classList.add("disabled");
+                    }
+                    else {
+                        previous_btn.classList.remove("disabled");
+                    }
+                    next_btn.classList.remove("disabled");
+                } else if (arg === "n") {
+                    if (end >= EOF) {
+                        next_btn.classList.add("disabled");
+                    }
+                    else {
+                        next_btn.classList.remove("disabled");
+                    }
+                    previous_btn.classList.remove("disabled");
+                }
+            }
+
+            function next() {
+                if (check_pags('n')) {
+                    start += diff;
+                    end += diff;
+                }
+                check_btns('n');
+                load_posts();
+            }
+
+            function previous() {
+                if (check_pags('p')) {
+                    start -= diff;
+                    end -= diff;
+                }
+                check_btns('p');
+                load_posts();
+            }
+
+        
+
+
+
+           
+            // Add event listener to the follow button
+            document.querySelector(".follow-btn").addEventListener('click', () => {
+                const element = document.querySelector('.follow-btn');
+                fetch(`/follow/{{user_profile.id}}`, {
+                    method: 'PUT',
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.is_following) {
+                        element.innerHTML = "Following";
+                    } else {
+                        element.innerHTML = "Follow";
+                    }
+
+                    // Update the follwer and following counts
+                    document.querySelector("#follower p").innerHTML = result.followers
+                    document.querySelector("#following p").innerHTML = result.following
+                });
+            });
+
+        });
+        </script>
+    {% endblock %}
+
+
+
+
+
+
